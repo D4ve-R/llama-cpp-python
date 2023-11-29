@@ -1,0 +1,472 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/10.0.0/marked.min.js" integrity="sha512-EjCqglelq9tO9KdT2iRYtcj19Q8sSXblMy+5SBfogeh5TvLwmRh9dz5l1uEwNO40/cZInZsr3jti2JCNMZJsng==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/marked-highlight/2.0.7/index.umd.min.js" integrity="sha512-tjT8o0TZHIFraBt9sHN3merw8eJnF5nI9kBr2mlDJ9bC2D8wXHMZH5ZkyJw7jJrrVNUCTkHRm71vV2tKz2mGQA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" integrity="sha512-Jk4AqjWsdSzSWCSuQTfYRIF84Rq/eV0G2+tu07byYwHcbTGfdmLrHjUSwvzp5HvbiqK4ibmNwdcG49Y5RGYPTg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js" integrity="sha512-8RnEqURPUc5aqFEN04aQEiPlSAdE0jlFS/9iGgUyNtwFnSKCXhmB6ZTNl7LnDtDWKabJIASzXrzD0K+LYexU9g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css" integrity="sha512-uf06llspW44/LZpHzHT6qBOIVODjWtv4MxCricRxkzvopAlSWnTf6hpZTFxuuZcuNE9CBQhqE0Seu1CoRk84nQ==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+        <style>
+          dialog::backdrop {
+            background-color: black;
+            opacity: 0.75;
+          }
+          .v-enter-active,
+          .v-leave-active {
+            transition: opacity 0.5s ease;
+          }
+          .v-enter-from,
+          .v-leave-to {
+            opacity: 0;
+          }
+          code {
+            background-color: rgb(229 231 235);
+          }
+          @media (prefers-color-scheme: dark) {
+            code {
+              background-color: rgb(51 65 85); 
+            }
+          }
+        </style>
+        <title>🦙LlamaC++ Server</title>
+    </head>
+    <body class="h-screen max-w-7xl mx-auto px-2 bg-amber-50/10 dark:bg-[#0b0f19] text-slate-900 dark:text-slate-100">
+      <header class="my-4 flex items-center justify-between">
+        <h1 class="text-5xl font-mono font-semibold leading-1">
+          🦙<span class="font-sans tracking-tighter text-orange-500">C++</span> Server
+        </h1>
+        <nav class="flex space-x-6 text-lg uppercase items-center font-medium">
+          <a href="https://huggingface.co/models?search=gguf" target="_blank">Models</a>
+          <a href="/docs" target="_blank">API</a>
+          <a href="https://github.com/abetlen/llama-cpp-python" target="_blank">
+            <svg class="w-8 h-8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+              <path d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24zm3.163 21.783h-.093a.513.513 0 0 1-.382-.14.513.513 0 0 1-.14-.372v-1.406c.006-.467.01-.94.01-1.416a3.693 3.693 0 0 0-.151-1.028 1.832 1.832 0 0 0-.542-.875 8.014 8.014 0 0 0 2.038-.471 4.051 4.051 0 0 0 1.466-.964c.407-.427.71-.943.885-1.506a6.77 6.77 0 0 0 .3-2.13 4.138 4.138 0 0 0-.26-1.476 3.892 3.892 0 0 0-.795-1.284 2.81 2.81 0 0 0 .162-.582c.033-.2.05-.402.05-.604 0-.26-.03-.52-.09-.773a5.309 5.309 0 0 0-.221-.763.293.293 0 0 0-.111-.02h-.11c-.23.002-.456.04-.674.111a5.34 5.34 0 0 0-.703.26 6.503 6.503 0 0 0-.661.343c-.215.127-.405.249-.573.362a9.578 9.578 0 0 0-5.143 0 13.507 13.507 0 0 0-.572-.362 6.022 6.022 0 0 0-.672-.342 4.516 4.516 0 0 0-.705-.261 2.203 2.203 0 0 0-.662-.111h-.11a.29.29 0 0 0-.11.02 5.844 5.844 0 0 0-.23.763c-.054.254-.08.513-.081.773 0 .202.017.404.051.604.033.199.086.394.16.582A3.888 3.888 0 0 0 5.702 10a4.142 4.142 0 0 0-.263 1.476 6.871 6.871 0 0 0 .292 2.12c.181.563.483 1.08.884 1.516.415.422.915.75 1.466.964.653.25 1.337.41 2.033.476a1.828 1.828 0 0 0-.452.633 2.99 2.99 0 0 0-.2.744 2.754 2.754 0 0 1-1.175.27 1.788 1.788 0 0 1-1.065-.3 2.904 2.904 0 0 1-.752-.824 3.1 3.1 0 0 0-.292-.382 2.693 2.693 0 0 0-.372-.343 1.841 1.841 0 0 0-.432-.24 1.2 1.2 0 0 0-.481-.101c-.04.001-.08.005-.12.01a.649.649 0 0 0-.162.02.408.408 0 0 0-.13.06.116.116 0 0 0-.06.1.33.33 0 0 0 .14.242c.093.074.17.131.232.171l.03.021c.133.103.261.214.382.333.112.098.213.209.3.33.09.119.168.246.231.381.073.134.15.288.231.463.188.474.522.875.954 1.145.453.243.961.364 1.476.351.174 0 .349-.01.522-.03.172-.028.343-.057.515-.091v1.743a.5.5 0 0 1-.533.521h-.062a10.286 10.286 0 1 1 6.324 0v.005z"/>
+            </svg>
+          </a>
+        </nav>
+      </header>
+      <!-- <main id="app" class="">
+        <section class="pb-12 mt-2 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-3 items-start">
+          <div class="col-span-full sm:col-span-1">
+            <div class="border dark:border-slate-700 dark:bg-slate-800 shadow-lg rounded-lg p-2">
+              <label for="model-upload" class="block text-md font-medium leading-6">Model Upload</label>
+              <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-400 px-6 py-10">
+                <div @drop.prevent="uploadFile" @dragenter.prevent @dragover.prevent class="text-center">
+                  <svg class="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clip-rule="evenodd" />
+                  </svg>
+                  <div class="mt-4 flex text-sm leading-6 text-gray-600">
+                    <label for="file-upload" class="relative cursor-pointer rounded-md font-semibold text-indigo-600 focus-within:outline-none hover:text-indigo-500">
+                      <span>Click here </span>
+                      <input @change.prevent="uploadFile" id="file-upload" name="file-upload" type="file" class="sr-only" accept=".gguf,.json">
+                    </label>
+                    <p class="pl-1">or drag and drop</p>
+                  </div>
+                  <p class="text-xs leading-5 text-gray-600">GGUF, JSON</p>
+                </div>
+              </div>
+              <Transition>
+                <div v-show="uploadProgress > 1" class="mt-2 h-1 w-full bg-gray-200 dark:bg-slate-700">
+                  <div class="h-1 bg-indigo-500" :style="'width: '+uploadProgress+'%'"></div>
+                </div>
+              </Transition>
+            </div>
+
+            <div class="mt-4 border dark:border-slate-700 dark:bg-slate-800 shadow-lg rounded-lg p-2">
+                <label for="models" class="block text-md font-medium leading-6">Models</label>
+                <div class="mt-2 rounded-lg border border-gray-400 overflow-hidden">
+                  <ul role="list" class="divide-y dark:divide-slate-700 max-h-96 overflow-y-auto">
+                    <li 
+                      v-for="model in models" :key="model.id"
+                      @click.prevent="activeModel = model.id"
+                      :class="activeModel === model.id ? 'bg-indigo-500/10' : 'cursor-pointer'"
+                      class="flex justify-between gap-x-6 py-5 px-2">
+                      <div class="flex min-w-0 gap-x-4">
+                        <svg class="h-10 w-10 rounded-full" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                  stroke-width="1" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                                </svg>
+                        <div class="min-w-0 flex-auto">
+                          <p class="text-sm font-semibold leading-6">{{model.id}}</p>
+                          <p @click="fetchSettings(model.id)" class="mt-1 truncate text-xs leading-5 text-gray-500">{{model.owned_by}}</p>
+                        </div>
+                      </div>
+                      <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end">
+                        <p class="text-sm leading-6">{{model.object}}</p>
+                        <span v-if="activeModel === model.id" class="mt-1 mr-1 relative flex h-3 w-3">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
+                        </span>
+                        <p v-else class="mt-1 text-xs leading-5 text-gray-500">{{ model.created || 'Unknown'}}</p>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+            </div>
+          </div>
+          <div class="relative grow-0 col-span-full sm:col-span-2 border dark:border-slate-700 dark:bg-slate-800 shadow-lg rounded-lg p-2 h-full overflow-y-hidden">
+            <ul ref="chatContainer" class="divide-y dark:divide-slate-700 overflow-y-auto">
+              <li v-for="message in chat"
+              class="w-full flex text-center py-6 overflow-x-hidden">
+                <span class="w-1/6 flex justify-end pr-4">
+                  <svg v-if="message.role === 'user'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                      stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-indigo-600">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                      stroke="currentColor" class="w-10 h-10 text-orange-500">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+                  </svg>
+                </span>
+               
+                  <p v-if="typeof message.content === 'string'" 
+                    class="w-full text-left pl-4 break-words whitespace-pre-line" v-html="renderMd(message.content)">
+                  </p>
+              </li>
+              <li v-show="responseBuffer" class="w-full flex text-center py-6 overflow-x-hidden">
+                <span class="w-1/6 flex justify-end pr-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-10 h-10 text-orange-500">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+                  </svg>
+                </span>
+                <p class="w-full text-left pl-4 break-words whitespace-pre-line" v-html="renderMd(responseBuffer)">
+                </p>
+              </li>
+            </ul>
+            <div class="absolute bottom-4 w-full pl-4 pr-6 flex items-center">
+              <input @keyup.enter="submit" v-model="prompt" :disabled="processing" type="text" class="border rounded-md mr-2 w-full dark:bg-slate-800 p-2" placeholder="Message">
+              <svg v-if="!processing" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                @click.prevent="submit"
+                class="w-8 h-8 cursor-pointer"
+                fill="none" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+              </svg>
+              <div v-else
+                class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-indigo-600 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                role="status"></div>
+            </div>
+          </div>
+
+          <dialog ref="settingsDialog" class="max-w-5xl rounded-lg">
+            <button @click="settingsDialog.close()" autofocus>Close</button>
+            <p>{{ settings }}</p>
+            <form method="dialog" class="p-2" v-if="settings">
+              <div class="space-y-12">
+                <div class="border-b border-gray-900/10 pb-12">
+                  <h2 class="text-base font-semibold leading-7">Model Settings</h2>
+                  <p class="mt-1 text-sm leading-6 text-gray-600">Overwrite model settings.</p>
+                
+                  <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <div class="sm:col-span-3">
+                      <label for="alias" class="block text-sm font-medium leading-6">Alias</label>
+                      <div class="mt-2">
+                        <input v-model="settings.model_alias" disabled type="text" name="alias" id="alias" class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                      </div>
+                    </div>
+
+                    <div class="sm:col-span-3">
+                      <label for="path" class="block text-sm font-medium leading-6">Path</label>
+                      <div class="mt-2">
+                        <input v-model="settings.model" disabled type="text" name="path" id="path" class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                      </div>
+                    </div>
+
+                    <div class="w-full">
+                      <label for="n_threads" class="block text-sm font-medium leading-6">Threads</label>
+                      <div class="mt-2">
+                        <input v-model="settings.n_threads" type="number" name="n_threads" id="n_threads" class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                      </div>
+                    </div>
+                  
+                    <div class="col-span-full">
+                      <details>
+                        <summary class="cursor-pointer">GPU Settings</summary>
+                        <div class="flex w-full mt-2 justify-around gap-x-8">
+                          <div class="w-full">
+                            <label for="n_gpu_layers" class="block text-sm font-medium leading-6">GPU Layers</label>
+                            <div class="mt-2">
+                              <input v-model="settings.n_gpu_layers" type="nmuber" name="n_gpu_layer" id="n_gpu_layer" class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                            </div>
+                          </div>
+                        
+                          <div class="w-full">
+                            <label for="main_gpu" class="block text-sm font-medium leading-6">GPU Main Device ID</label>
+                            <div class="mt-2">
+                              <input v-model="settings.main_gpu" type="number" name="main_gpu" id="main_gpu" class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                            </div>
+                          </div>
+                        </div>
+                      </details>
+                    </div>
+
+                    <div class="col-span-full">
+                      <details>
+                        <summary class="cursor-pointer">Cache Settings</summary>
+                        <div class="flex w-full mt-2 justify-around">
+                          <div class="relative flex gap-x-3">
+                            <div class="flex h-6 items-center">
+                              <input v-model="settings.cache" id="cache" name="cache" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                            </div>
+                            <div class="text-sm leading-6">
+                              <label for="cache" class="font-medium">Enable Cache</label>
+                              <p class="text-gray-500">Enable caching.</p>
+                            </div>
+                          </div>
+                          <div class="">
+                            <label for="cache_size" class="block text-sm font-medium leading-6">Cache Size</label>
+                            <div class="mt-2">
+                              <input v-model="settings.cache_size" type="number" name="cache_size" id="cache_size" class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                            </div>
+                          </div>
+                          <div class="">
+                            <label for="cache_type" class="block text-sm font-medium leading-6">Cache Type</label>
+                            <div class="mt-2">
+                              <select v-model="settings.cache_type" id="cache_type" name="cache_type" class="block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6">
+                                <option value="ram">RAM</option>
+                                <option value="disk">DISK</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </details>
+                    </div>
+                  </div>
+                </div>
+                <div class="border-b border-gray-900/10 pb-12">
+                  <h2 class="text-base font-semibold leading-7 text-gray-900">Settings Upload</h2>
+                  <p class="mt-1 text-sm leading-6 text-gray-600">This information will be displayed publicly so be careful what you share.</p>
+                  
+                    <div class="col-span-full">
+                      <label for="cover-photo" class="block text-sm font-medium leading-6 text-gray-900">Upload</label>
+                      <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
+                        <div class="text-center">
+                          <svg class="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clip-rule="evenodd" />
+                          </svg>
+                          <div class="mt-4 flex text-sm leading-6 text-gray-600">
+                            <label for="file-upload" class="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
+                              <span>Upload a settings</span>
+                              <input id="file-upload" name="file-upload" type="file" class="sr-only">
+                            </label>
+                            <p class="pl-1">or drag and drop</p>
+                          </div>
+                          <p class="text-xs leading-5 text-gray-600">JSON</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              
+                <div class="border-b border-gray-900/10 pb-12">
+                  <h2 class="text-base font-semibold leading-7 text-gray-900">Notifications</h2>
+                  <p class="mt-1 text-sm leading-6 text-gray-600">We'll always let you know about important changes, but you pick what else you want to hear about.</p>
+                
+                  <div class="mt-10 space-y-10">
+                    <fieldset>
+                      <legend class="text-sm font-semibold leading-6 text-gray-900">By Email</legend>
+                      <div class="mt-6 space-y-6">
+                        <div class="relative flex gap-x-3">
+                          <div class="flex h-6 items-center">
+                            <input id="comments" name="comments" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                          </div>
+                          <div class="text-sm leading-6">
+                            <label for="comments" class="font-medium text-gray-900">Comments</label>
+                            <p class="text-gray-500">Get notified when someones posts a comment on a posting.</p>
+                          </div>
+                        </div>
+                        <div class="relative flex gap-x-3">
+                          <div class="flex h-6 items-center">
+                            <input id="candidates" name="candidates" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                          </div>
+                          <div class="text-sm leading-6">
+                            <label for="candidates" class="font-medium text-gray-900">Candidates</label>
+                            <p class="text-gray-500">Get notified when a candidate applies for a job.</p>
+                          </div>
+                        </div>
+                        <div class="relative flex gap-x-3">
+                          <div class="flex h-6 items-center">
+                            <input id="offers" name="offers" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                          </div>
+                          <div class="text-sm leading-6">
+                            <label for="offers" class="font-medium text-gray-900">Offers</label>
+                            <p class="text-gray-500">Get notified when a candidate accepts or rejects an offer.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </fieldset>
+                    <fieldset>
+                      <legend class="text-sm font-semibold leading-6 text-gray-900">Push Notifications</legend>
+                      <p class="mt-1 text-sm leading-6 text-gray-600">These are delivered via SMS to your mobile phone.</p>
+                      <div class="mt-6 space-y-6">
+                        <div class="flex items-center gap-x-3">
+                          <input id="push-everything" name="push-notifications" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                          <label for="push-everything" class="block text-sm font-medium leading-6 text-gray-900">Everything</label>
+                        </div>
+                        <div class="flex items-center gap-x-3">
+                          <input id="push-email" name="push-notifications" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                          <label for="push-email" class="block text-sm font-medium leading-6 text-gray-900">Same as email</label>
+                        </div>
+                        <div class="flex items-center gap-x-3">
+                          <input id="push-nothing" name="push-notifications" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                          <label for="push-nothing" class="block text-sm font-medium leading-6 text-gray-900">No push notifications</label>
+                        </div>
+                      </div>
+                    </fieldset>
+                  </div>
+                </div>
+              </div>
+            
+              <div class="mt-6 flex items-center justify-end gap-x-6">
+                <button @click="settingsDialog.close()" type="button" class="text-sm font-semibold leading-6 text-gray-900">Cancel</button>
+                <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save</button>
+              </div>
+            </form>
+          </dialog>
+
+        </section>
+      </main> -->
+
+
+      <iframe class="w-full h-full rounded-lg" src="/ui" frameborder="0"></iframe>
+      <script>
+        const { createApp, ref, onMounted } = Vue;
+        createApp({
+          setup() {
+            const models = ref([]);
+            const activeModel = ref('');
+            const uploadProgress = ref(0);
+            const prompt = ref('');
+            const chat = ref([]);
+            const responseBuffer = ref('');
+            const chatContainer = ref(null);
+            const processing = ref(false);
+            const settings = ref({});
+            const settingsDialog = ref(null);
+      
+            onMounted(() => fetchModels());
+
+            const fetchModels = async () => {
+              try {
+                const response = await fetch('/v1/models');
+                const data = await response.json();
+                models.value = data.data;
+                activeModel.value = data.data[0]?.id || '';
+              } catch (error) {
+                console.error('Error fetching data:', error);
+              }
+            };
+
+            const uploadFile = async (e) => {
+              const file = e.target?.files[0] || e.dataTransfer?.files[0];
+              const formData = new FormData();
+              formData.append('file', file);
+              const xhr = new XMLHttpRequest();
+              xhr.upload.onprogress = function (event) {
+                if (event.lengthComputable) {
+                  const percentage = (event.loaded / event.total) * 100;
+                  uploadProgress.value = percentage;
+                }
+              };
+              xhr.onload = () => {uploadProgress.value = 0; fetchModels();}
+              xhr.open('POST', '/upload', true);
+              xhr.send(formData);
+            };
+
+            const submit = async () => {
+              if (!prompt.value) return;
+              processing.value = true;
+              chat.value.push({role: 'user', content: prompt.value});
+              scrollToBottom();
+              const response = await fetch('v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json', 
+                  'Accept': 'text/eventstream; charset=utf-8'
+                },
+                body: JSON.stringify({
+                  model: activeModel.value,
+                  stream: true,
+                  max_tokens: 300,
+                  messages: [{role: 'user', content: prompt.value}]
+                })
+              });
+              prompt.value = '';
+              const reader = response.body.getReader();
+              const decoder = new TextDecoder();
+              await new Promise(resolve => {
+                function stream() {
+                  return reader.read().then(({ done, value }) => {
+                    if (done) { resolve(); return; }
+                    try {
+                      let data = decoder.decode(value).split('data:');
+                      if (data.length > 1) data = data[data.length-1]
+                      data = JSON.parse(data);
+                      responseBuffer.value += data.choices[0].delta?.content || '';
+                    } catch(e) { console.warn(e) }
+                    return stream();
+                  });
+                }
+                stream();
+              });
+              chat.value.push({role: 'assistant', content: responseBuffer.value});
+              responseBuffer.value = '';
+              processing.value = false;
+              scrollToBottom();
+            };
+
+            const scrollToBottom = () => {
+              setTimeout(()=>
+              chatContainer.value?.scrollTo({
+                  top: chatContainer.value?.scrollHeight || 0,
+              }), 100);
+            };
+
+            const markedjs = new marked.Marked(markedHighlight.markedHighlight({
+              langPrefix: 'hljs language-',
+              highlight(code, lang) {
+                const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                return hljs.highlight(code, { language }).value;
+              }
+            }));
+            const renderMd = (md) => {
+              return markedjs.parse(md);
+            }
+
+            const fetchSettings = async (model) => {
+              let res = await fetch(`/v1/models/${model}`);
+              res = await res.json();
+              settings.value = res.settings;
+              settingsDialog.value.showModal();
+            };
+      
+            return {
+              models,
+              activeModel,
+              uploadFile,
+              uploadProgress,
+              prompt,
+              chat,
+              submit,
+              responseBuffer,
+              chatContainer,
+              processing,
+              renderMd,
+              settings,
+              settingsDialog,
+              fetchSettings
+            };
+          },
+        }).mount('#app');
+      </script>
+    </body>
+</html>
