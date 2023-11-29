@@ -144,8 +144,10 @@ class ServerSettings(BaseSettings):
         description="Whether to interrupt requests when a new request is received.",
     )
     config: Optional[str] = Field(default=None, description="Path to config file")
+    plugins: Optional[str] = Field(default=None, description="Path to the plugins directory")
 
 class Settings(ModelSettings):
+    model_config = SettingsConfigDict(env_file='model.env', extra='ignore')
     models: Optional[List[ModelSettings]] = Field(
         default = [],
         description="Model configs, overwrites default config"

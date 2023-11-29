@@ -28,8 +28,11 @@ from typing import List, Literal, Union
 
 import uvicorn
 
+from llama_cpp import __version__
 from llama_cpp.server.app import create_app
 from llama_cpp.server.settings import Settings, ServerSettings, set_settings
+from llama_cpp.server.model import set_llama
+from llama_cpp.server.plugins import import_plugins
 
 EXE_NAME = 'llama_server'
 
@@ -95,9 +98,8 @@ def main():
                 type=parse_bool_arg,
                 help=f"{description}",
             )
-    
+    args = parser.parse_args()
     try:
-        args = parser.parse_args()
         server_settings = ServerSettings(**{k: v for k, v in vars(args).items() if v is not None})
         set_settings(server_settings)
         if server_settings.config and os.path.exists(server_settings.config):
@@ -105,11 +107,17 @@ def main():
                 llama_settings = Settings.model_validate_json(f.read())
         else:
             llama_settings = Settings(**{k: v for k, v in vars(args).items() if v is not None})
-        app = create_app(settings=llama_settings)
+            lifespan = "" if server_settings.plugins else None
+        set_llama(llama_settings)
+        app = create_app(title="🦙 llama.cpp Python API", version=__version__)
     except Exception as e:
         print(e, file=sys.stderr)
         parser.print_help()
         sys.exit(1)
+
+    if server_settings.plugins and os.path.isdir(server_settings.plugins):
+        for plugin in import_plugins(server_settings.plugins):
+            app = plugin().init(app)
 
     uvicorn.run(
         app, host=server_settings.host, port=server_settings.port
