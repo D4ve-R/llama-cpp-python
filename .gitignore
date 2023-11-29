@@ -9,6 +9,16 @@ _skbuild/
 
 models/
 
+# apple stuff
+.DS_Store
+
+# exclude convert script from vendor/llama.cpp
+llama_cpp/extra/
+# Ignore all normal python files in the plugins dir
+#llama_cpp/server/plugins/**/*.py
+#!llama_cpp/server/plugins/__init__.py
+chroma
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
